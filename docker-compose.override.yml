@@ -1,0 +1,12 @@
+services:
+  gitlab-runner:
+    image: gitlab/gitlab-runner:alpine
+    restart: unless-stopped
+    # environment:
+      #CA_CERTIFICATES_PATH: $GITLAB_HOME/config/trusted-certs
+      #CI_SERVER_URL: https://$GITLAB_HOST/
+    depends_on:
+      - gitlab
+    volumes:
+      - $GITLAB_HOME/config/gitlab-runner:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock

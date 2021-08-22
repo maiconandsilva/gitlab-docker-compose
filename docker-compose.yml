@@ -1,63 +1,22 @@
+version: "3.0"
+
 services:
   gitlab:
-    image: gitlab/gitlab-ce:14.1.0-ce.0
+    image: gitlab/gitlab-ce
     restart: unless-stopped
-    hostname: gitlab.local
+    shm_size: 256m
+    logging:
+      driver: "journald"
     ports:
-      # - 443:443
-      - '8001:80'
-      - '8822:22'
+      # - "443:443"
+      - "$GITLAB_HTTP_PORT:$GITLAB_HTTP_PORT"
+      - "$GITLAB_SSH_PORT:22"
+    env_file:
+      - .env
     environment:
-      GITLAB_HOME: $HOME/gitlab
-      GITLAB_OMNIBUS_CONFIG: |
-          external_url 'http://gitlab.local'
-          # Add any other gitlab.rb configuration here, each on its own line
-          
-          gitlab_rails['gitlab_shell_ssh_port'] = 8822
-
-          ### GitLab user privileges
-          gitlab_rails['gitlab_default_can_create_group'] = true
-          gitlab_rails['gitlab_username_changing_enabled'] = false
-
-          ### Default Theme
-          ### Available values:
-          ##! `1`  for Indigo
-          ##! `2`  for Dark
-          ##! `3`  for Light
-          ##! `4`  for Blue
-          ##! `5`  for Green
-          ##! `6`  for Light Indigo
-          ##! `7`  for Light Blue
-          ##! `8`  for Light Green
-          ##! `9`  for Red
-          ##! `10` for Light Red
-          gitlab_rails['gitlab_default_theme'] = 3
-
-          gitlab_rails['iomniauth_enabled'] = false
-          gitlab_rails['impersonation_enabled'] = true
+      GITLAB_OMNIBUS_CONFIG: "from_file('/omnibus_config.rb')"
     volumes:
       - $GITLAB_HOME/config:/etc/gitlab
       - $GITLAB_HOME/logs:/var/log/gitlab
       - $GITLAB_HOME/data:/var/opt/gitlab
-    # links:
-    #   - gitlab-runner
-
-  gitlab-runner:
-    image: gitlab/gitlab-runner:v14.1.0
-    restart: unless-stopped
-    depends_on:
-      - gitlab
-    environment:
-      TZ: America/Sao_Paulo
-      # CA_CERTIFICATES_PATH: $GITLAB_HOME/config/trusted-certs
-    ports:
-      - 8093:8093
-    volumes:
-      - $GITLAB_HOME/config/gitlab-runner:/etc/gitlab-runner
-      - /var/run/docker.sock:/var/run/docker.sock
-    # links:
-    #   - gitlab-runner
-
-# networks:
-#   gitlab-runner: 
-#     external: true
+      - ./gitlab.rb:/omnibus_config.rb
