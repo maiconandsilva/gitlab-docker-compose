@@ -6,7 +6,7 @@ services:
         mode: replicated
         replicas: 4
     environment:
-        TZ: America/Sao_Paulo
+        TZ: $TZ
         #CA_CERTIFICATES_PATH: $GITLAB_HOME/config/trusted-certs
         #CI_SERVER_URL: https://$GITLAB_HOST/
     volumes:
