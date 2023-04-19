@@ -5,10 +5,6 @@ services:
     deploy:
         mode: replicated
         replicas: 4
-    depends_on:
-        - gitlab
-    ports:
-      - 8093:8093
     environment:
         TZ: America/Sao_Paulo
         #CA_CERTIFICATES_PATH: $GITLAB_HOME/config/trusted-certs
